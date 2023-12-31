@@ -1,14 +1,13 @@
+<!--using state to manipulate DOM. just a read-only UI where todos are being fetched from the server in an arr-->
+
 <html>
   <body>
     <div>
       <input type="text" id="title" placeholder="title"><br><br>
       <input type="text" id="description" placeholder="description"><br><br>
-      <button onclick="addTodo()">Add todo</button><br><br>
       <div id="container">
     </div>
     <script>
-      let taskId = 1;
-
       function markDone(id) {
         document.getElementById(id).children[2].innerHTML = "Done!";
       }
@@ -34,11 +33,21 @@
         return taskBody;
       }
 
-      function addTodo() {
-        const title = document.getElementById("title").value;
-        const description = document.getElementById("description").value;
-        document.getElementById("container").appendChild(createTask(title, description, taskId++));
+      function updateState(state) {
+        const parent = document.getElementById("container");
+        //clearing container
+        parent.innerHTML = "";
+        for (let i=0; i<state.length; i++) {
+          parent.appendChild(createTask(state[i].title, state[i].description, state[i].id));
+        }
       }
+
+      window.setInterval(async () => {
+        const response = await fetch("http://localhost:3000/");
+        const arrJSON = await response.json();
+        updateState(arrJSON.todos);
+      }, 5000);
+      
     </script>
   </body>
 </html>
